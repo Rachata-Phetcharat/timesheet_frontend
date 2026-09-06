@@ -14,6 +14,7 @@ export const ClockInOutCard: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [actionType, setActionType] = useState<'in' | 'out'>('in')
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const { data: summary, isLoading: isSummaryLoading } = useAttendanceSummary()
   const clockInMutation = useClockIn()
@@ -43,8 +44,11 @@ export const ClockInOutCard: React.FC = () => {
       }
       setIsModalOpen(false)
       setTimeout(() => setSuccessMessage(null), 4000)
-    } catch (err) {
+    } catch (err: any) {
       console.error('Clock action failed:', err)
+      const msg = err.response?.data?.detail || 'เกิดข้อผิดพลาดในการบันทึกเวลา'
+      setErrorMessage(msg)
+      setTimeout(() => setErrorMessage(''), 5000)
     }
   }
 
@@ -104,6 +108,14 @@ export const ClockInOutCard: React.FC = () => {
               <span>กะทำงานปกติ 09:00 - 18:00 น.</span>
             </div>
           </div>
+
+          {/* Alert Error */}
+          {errorMessage && (
+            <div className="flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 p-3.5 text-sm text-rose-800 animate-fade-in">
+              <AlertTriangle className="h-5 w-5 text-rose-600 flex-shrink-0" />
+              <span className="font-medium">{errorMessage}</span>
+            </div>
+          )}
 
           {/* Alert Success */}
           {successMessage && (

@@ -6,6 +6,7 @@ import { CreateLeaveRequestInput } from '../../types/leave'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Select } from '../ui/select'
+import { DateRangePicker } from '../ui/date-range-picker'
 import { LEAVE_TYPE_OPTIONS } from './LeaveTypeSelect'
 import { Send, CalendarDays, FileText, CheckCircle2 } from 'lucide-react'
 
@@ -13,6 +14,9 @@ const leaveSchema = z
   .object({
     type: z.enum(['personal', 'sick', 'vacation'], {
       message: 'กรุณาเลือกประเภทการลา',
+    }),
+    duration: z.enum(['full_day', 'morning', 'afternoon'], {
+      message: 'กรุณาระบุช่วงเวลาที่ลา',
     }),
     startDate: z.string().min(1, 'กรุณาใส่วันที่เริ่มต้นลา'),
     endDate: z.string().min(1, 'กรุณาใส่วันที่สิ้นสุดการลา'),
@@ -38,12 +42,18 @@ interface LeaveRequestFormProps {
   onSubmit: (data: CreateLeaveRequestInput) => Promise<void>
   isLoading?: boolean
   onSuccess?: () => void
+  remainingQuotas?: {
+    personal: number
+    sick: number
+    vacation: number
+  }
 }
 
 export const LeaveRequestForm: React.FC<LeaveRequestFormProps> = ({
   onSubmit,
   isLoading,
   onSuccess,
+  remainingQuotas = { personal: 6, sick: 30, vacation: 10 },
 }) => {
   const [isSubmitted, setIsSubmitted] = React.useState(false)
 
@@ -52,32 +62,64 @@ export const LeaveRequestForm: React.FC<LeaveRequestFormProps> = ({
     handleSubmit,
     watch,
     reset,
+    setValue,
+    setError,
     formState: { errors },
   } = useForm<LeaveFormValues>({
     resolver: zodResolver(leaveSchema),
     defaultValues: {
       type: 'personal',
-      startDate: new Date().toISOString().slice(0, 10),
-      endDate: new Date().toISOString().slice(0, 10),
+      duration: 'full_day',
+      startDate: '',
+      endDate: '',
       reason: '',
     },
   })
 
   const startDate = watch('startDate')
   const endDate = watch('endDate')
+  const duration = watch('duration')
+  const type = watch('type')
+
+  React.useEffect(() => {
+    if (type !== 'personal') {
+      setValue('duration', 'full_day')
+    }
+  }, [type, setValue])
 
   // Calculate day count
   const calculateDays = () => {
-    if (!startDate || !endDate) return 1
+    if (!startDate || !endDate) return 0
     const start = new Date(startDate).getTime()
     const end = new Date(endDate).getTime()
-    const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1
+    let diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1
+    
+    if (diffDays > 0 && type === 'personal' && (duration === 'morning' || duration === 'afternoon')) {
+      diffDays -= 0.5
+    }
+    
     return diffDays > 0 ? diffDays : 0
   }
 
   const daysCount = calculateDays()
 
   const handleFormSubmit = async (values: LeaveFormValues) => {
+    const requestedDays = calculateDays()
+    
+    // Check quota
+    if (values.type === 'personal' && requestedDays > remainingQuotas.personal) {
+      setError('type', { type: 'manual', message: `สิทธิลากิจของคุณเหลือเพียง ${remainingQuotas.personal} วัน` })
+      return
+    }
+    if (values.type === 'sick' && requestedDays > remainingQuotas.sick) {
+      setError('type', { type: 'manual', message: `สิทธิลาป่วยของคุณเหลือเพียง ${remainingQuotas.sick} วัน` })
+      return
+    }
+    if (values.type === 'vacation' && requestedDays > remainingQuotas.vacation) {
+      setError('type', { type: 'manual', message: `สิทธิลาพักร้อนของคุณเหลือเพียง ${remainingQuotas.vacation} วัน` })
+      return
+    }
+
     await onSubmit(values)
     setIsSubmitted(true)
     reset()
@@ -97,34 +139,38 @@ export const LeaveRequestForm: React.FC<LeaveRequestFormProps> = ({
         </div>
       )}
 
-      <Select
-        label="ประเภทการลา"
-        options={LEAVE_TYPE_OPTIONS}
-        error={errors.type?.message}
-        {...register('type')}
-      />
-
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input
-          type="date"
-          label="วันที่เริ่มต้นลา"
-          error={errors.startDate?.message}
-          {...register('startDate')}
+        <Select
+          label="ประเภทการลา"
+          options={LEAVE_TYPE_OPTIONS}
+          error={errors.type?.message}
+          {...register('type')}
         />
-        <Input
-          type="date"
-          label="วันที่สิ้นสุดการลา"
-          error={errors.endDate?.message}
-          {...register('endDate')}
+        <Select
+          label="ช่วงเวลาที่ลา"
+          options={[
+            { label: 'ตลอดวัน', value: 'full_day' },
+            { label: 'ครึ่งเช้า', value: 'morning' },
+            { label: 'ครึ่งบ่าย', value: 'afternoon' },
+          ]}
+          error={errors.duration?.message}
+          disabled={type !== 'personal'}
+          {...register('duration')}
         />
       </div>
 
-      {daysCount > 0 && (
-        <div className="flex items-center gap-2 rounded-xl bg-indigo-50/70 border border-indigo-100 px-4 py-2.5 text-xs font-medium text-indigo-800">
-          <CalendarDays className="h-4 w-4 text-indigo-600" />
-          <span>ระยะเวลาการลาทั้งหมด: <strong className="text-indigo-950 font-bold">{daysCount} วัน</strong></span>
-        </div>
-      )}
+      <div className="w-full">
+        <DateRangePicker
+          label="ช่วงวันที่ลา (เริ่มต้น - สิ้นสุด)"
+          startDate={startDate}
+          endDate={endDate}
+          onChange={(range) => {
+            setValue('startDate', range.startDate, { shouldValidate: true })
+            setValue('endDate', range.endDate, { shouldValidate: true })
+          }}
+          error={errors.startDate?.message || errors.endDate?.message}
+        />
+      </div>
 
       <div className="space-y-1.5">
         <label className="block text-sm font-medium text-slate-700 select-none">

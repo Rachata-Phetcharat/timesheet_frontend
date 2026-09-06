@@ -8,9 +8,9 @@ interface LeaveTypeSelectProps extends Omit<SelectProps, 'options' | 'value' | '
 }
 
 export const LEAVE_TYPE_OPTIONS = [
-  { value: 'personal', label: 'ลากิจ (Personal Leave)' },
-  { value: 'sick', label: 'ลาป่วย (Sick Leave)' },
-  { value: 'vacation', label: 'ลาพักร้อน (Annual Vacation)' },
+  { value: 'personal', label: 'ลากิจ' },
+  { value: 'sick', label: 'ลาป่วย' },
+  { value: 'vacation', label: 'ลาพักร้อน' },
 ]
 
 export const LeaveTypeSelect: React.FC<LeaveTypeSelectProps> = (props) => {

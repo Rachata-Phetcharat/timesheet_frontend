@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
-import { LoginCredentials, User, UserRole } from '../types/user'
+import { LoginCredentials, User } from '../types/user'
 import { authApi } from '../api/auth'
-import { DEMO_ADMIN, DEMO_USER } from '../api/mockData'
 
 interface AuthContextType {
   user: User | null
@@ -10,7 +9,6 @@ interface AuthContextType {
   isLoading: boolean
   login: (credentials: LoginCredentials) => Promise<void>
   logout: () => Promise<void>
-  switchUserRole: (role: UserRole) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -35,13 +33,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(fetchedUser)
           localStorage.setItem('timesheet_user', JSON.stringify(fetchedUser))
           setToken(storedToken)
-        } else {
-          // Default pre-authenticated demo user for smooth immediate evaluation if wanted
-          // or leave null. Let's auto-login DEMO_USER so the app is instantly usable, but full login page is functional!
-          setToken('mock_jwt_access_token_demo')
-          setUser(DEMO_USER)
-          localStorage.setItem('timesheet_access_token', 'mock_jwt_access_token_demo')
-          localStorage.setItem('timesheet_user', JSON.stringify(DEMO_USER))
         }
       } catch (err) {
         console.error('Failed to initialize auth state:', err)
@@ -88,12 +79,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [])
 
-  const switchUserRole = useCallback((role: UserRole) => {
-    const target = role === 'admin' ? DEMO_ADMIN : DEMO_USER
-    setUser(target)
-    localStorage.setItem('timesheet_user', JSON.stringify(target))
-  }, [])
-
   return (
     <AuthContext.Provider
       value={{
@@ -103,7 +88,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         login,
         logout,
-        switchUserRole,
       }}
     >
       {children}

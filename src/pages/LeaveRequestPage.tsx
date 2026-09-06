@@ -1,5 +1,5 @@
 import React from 'react'
-import { useMyLeaveRequests, useCreateLeaveRequest } from '../hooks/useLeaveRequests'
+import { useMyLeaveRequests, useCreateLeaveRequest, useCancelLeaveRequest } from '../hooks/useLeaveRequests'
 import { LeaveRequestForm } from '../components/leave/LeaveRequestForm'
 import { LeaveRequestTable } from '../components/leave/LeaveRequestTable'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card'
@@ -8,15 +8,38 @@ import { CalendarDays, HeartPulse, UserCheck, ShieldAlert, FileText } from 'luci
 export const LeaveRequestPage: React.FC = () => {
   const { data: requests = [], isLoading: isRequestsLoading } = useMyLeaveRequests()
   const createMutation = useCreateLeaveRequest()
+  const cancelMutation = useCancelLeaveRequest()
 
   const handleCreateLeave = async (values: any) => {
     await createMutation.mutateAsync(values)
   }
 
+  const handleCancelLeave = async (id: string) => {
+    await cancelMutation.mutateAsync(id)
+  }
+
+  // Calculate exact days taken for a request
+  const getLeaveDays = (r: any) => {
+    if (!r.startDate || !r.endDate) return 0
+    const start = new Date(r.startDate).getTime()
+    const end = new Date(r.endDate).getTime()
+    let diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1
+    if (diffDays > 0 && r.type === 'personal' && (r.duration === 'morning' || r.duration === 'afternoon')) {
+      diffDays -= 0.5
+    }
+    return diffDays > 0 ? diffDays : 0
+  }
+
   // Quota mock calculations
-  const personalLeavesTaken = requests.filter((r) => r.type === 'personal' && r.status === 'approved').length
-  const sickLeavesTaken = requests.filter((r) => r.type === 'sick' && r.status === 'approved').length
-  const vacationLeavesTaken = requests.filter((r) => r.type === 'vacation' && r.status === 'approved').length
+  const personalLeavesTaken = requests
+    .filter((r) => r.type === 'personal' && r.status === 'approved')
+    .reduce((acc, r) => acc + getLeaveDays(r), 0)
+  const sickLeavesTaken = requests
+    .filter((r) => r.type === 'sick' && r.status === 'approved')
+    .reduce((acc, r) => acc + getLeaveDays(r), 0)
+  const vacationLeavesTaken = requests
+    .filter((r) => r.type === 'vacation' && r.status === 'approved')
+    .reduce((acc, r) => acc + getLeaveDays(r), 0)
 
   return (
     <div className="space-y-6">
@@ -74,42 +97,42 @@ export const LeaveRequestPage: React.FC = () => {
       </div>
 
       {/* Main Form & Table Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
         {/* Form Column */}
-        <div className="lg:col-span-5">
+        <div className="xl:col-span-4">
           <Card className="border-slate-200/80 bg-white">
             <CardHeader className="pb-4">
               <CardTitle className="text-base flex items-center gap-2">
                 <FileText className="h-5 w-5 text-indigo-600" />
                 แบบฟอร์มยื่นคำขอลางาน
               </CardTitle>
-              <CardDescription>
-                กรอกข้อมูลการลาเพื่อส่งให้ผู้บังคับบัญชาและฝ่ายบุคคลพิจารณา
-              </CardDescription>
             </CardHeader>
             <CardContent>
               <LeaveRequestForm
                 onSubmit={handleCreateLeave}
                 isLoading={createMutation.isPending}
+                remainingQuotas={{
+                  personal: 6 - personalLeavesTaken,
+                  sick: 30 - sickLeavesTaken,
+                  vacation: 10 - vacationLeavesTaken
+                }}
               />
             </CardContent>
           </Card>
         </div>
 
         {/* Table Column */}
-        <div className="lg:col-span-7">
+        <div className="xl:col-span-8">
           <Card className="border-slate-200/80 bg-white">
             <CardHeader className="pb-4">
               <CardTitle className="text-base">ประวัติและสถานะคำขอลางาน</CardTitle>
-              <CardDescription>
-                ตรวจสอบสถานะคำขอที่อยู่ระหว่างรออนุมัติหรือได้รับการอนุมัติแล้ว
-              </CardDescription>
             </CardHeader>
             <CardContent>
               <LeaveRequestTable
                 requests={requests}
                 isLoading={isRequestsLoading}
                 isAdmin={false}
+                onCancel={handleCancelLeave}
               />
             </CardContent>
           </Card>

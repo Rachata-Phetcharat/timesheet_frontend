@@ -53,3 +53,14 @@ export function useUpdateLeaveStatus() {
     },
   })
 }
+
+export function useCancelLeaveRequest() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => leaveRequestsApi.cancelLeaveRequest(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: LEAVE_KEYS.all })
+    },
+  })
+}

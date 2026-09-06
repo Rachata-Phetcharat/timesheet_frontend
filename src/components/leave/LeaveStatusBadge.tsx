@@ -30,6 +30,13 @@ export const LeaveStatusBadge: React.FC<LeaveStatusBadgeProps> = ({ status }) =>
           <span>ไม่อนุมัติ</span>
         </Badge>
       )
+    case 'cancelled':
+      return (
+        <Badge variant="outline" className="gap-1 px-2.5 py-1 text-slate-500 border-slate-300">
+          <XCircle className="h-3.5 w-3.5" />
+          <span>ยกเลิกแล้ว</span>
+        </Badge>
+      )
     default:
       return <Badge variant="secondary">{status}</Badge>
   }

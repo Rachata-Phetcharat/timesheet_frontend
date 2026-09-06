@@ -73,22 +73,22 @@ apiClient.interceptors.response.use(
       }
 
       try {
-        const response = await axios.post<{ accessToken: string; refreshToken?: string }>(
+        const response = await axios.post<{ access_token: string; refresh_token?: string }>(
           `${API_BASE_URL}/auth/refresh`,
-          { refreshToken }
+          { refresh_token: refreshToken }
         )
 
-        const { accessToken, refreshToken: newRefreshToken } = response.data
-        localStorage.setItem('timesheet_access_token', accessToken)
+        const { access_token, refresh_token: newRefreshToken } = response.data
+        localStorage.setItem('timesheet_access_token', access_token)
         if (newRefreshToken) {
           localStorage.setItem('timesheet_refresh_token', newRefreshToken)
         }
 
         if (originalRequest.headers) {
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`
+          originalRequest.headers.Authorization = `Bearer ${access_token}`
         }
 
-        processQueue(null, accessToken)
+        processQueue(null, access_token)
         return apiClient(originalRequest)
       } catch (refreshError) {
         processQueue(refreshError as AxiosError, null)

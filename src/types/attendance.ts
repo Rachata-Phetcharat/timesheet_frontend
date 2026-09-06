@@ -1,9 +1,10 @@
-export type AttendanceStatus = 'on_time' | 'late' | 'absent'
+export type AttendanceStatus = 'on_time' | 'late' | 'absent' | 'absent_half_morning' | 'absent_half_afternoon'
 
 export interface AttendanceRecord {
   id: string
   employeeId: string
   employeeName?: string
+  employeeEmail?: string
   date?: string
   clockInAt: string | null
   clockOutAt: string | null

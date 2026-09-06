@@ -2,14 +2,14 @@ import React from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
-import { LogOut, UserCircle2, ShieldCheck, UserCheck, Menu } from 'lucide-react'
+import { LogOut, UserCircle2, Menu } from 'lucide-react'
 
 interface NavbarProps {
   onToggleSidebar?: () => void
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
-  const { user, logout, switchUserRole } = useAuth()
+  const { user, logout } = useAuth()
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 sm:px-6 backdrop-blur-md">
@@ -28,39 +28,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
           </div>
           <div>
             <h1 className="text-base font-bold tracking-tight text-slate-900 leading-tight">
-              ระบบบันทึกเวลาและการลา
+              ระบบบันทึกเวลาการทำงาน (Timesheet)
             </h1>
-            <p className="text-[11px] text-slate-500 hidden sm:block">Timesheet & Leave Management</p>
           </div>
         </div>
       </div>
 
       <div className="flex items-center gap-3">
-        {/* Quick Role Switcher for Testing/Demonstration */}
-        <div className="hidden md:flex items-center gap-1.5 rounded-xl bg-slate-100 p-1 text-xs">
-          <button
-            onClick={() => switchUserRole('employee')}
-            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 font-medium transition-all ${
-              user?.role === 'employee'
-                ? 'bg-white text-indigo-700 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <UserCheck className="h-3.5 w-3.5" />
-            พนักงานทั่วไป
-          </button>
-          <button
-            onClick={() => switchUserRole('admin')}
-            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 font-medium transition-all ${
-              user?.role === 'admin'
-                ? 'bg-white text-indigo-700 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <ShieldCheck className="h-3.5 w-3.5" />
-            ผู้ดูแลระบบ (Admin)
-          </button>
-        </div>
 
         {/* User profile dropdown info */}
         <div className="flex items-center gap-2.5 border-l border-slate-200 pl-3">

@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { attendanceApi } from '../api/attendance'
 import { ClockInOutPayload } from '../types/attendance'
 
@@ -14,6 +14,7 @@ export function useAttendanceRecords(month?: string) {
   return useQuery({
     queryKey: ATTENDANCE_KEYS.list(month),
     queryFn: () => attendanceApi.getMonthlyRecords(month),
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -21,6 +22,7 @@ export function useAttendanceSummary(month?: string) {
   return useQuery({
     queryKey: ATTENDANCE_KEYS.summary(month),
     queryFn: () => attendanceApi.getMonthlySummary(month),
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -50,5 +52,6 @@ export function useTeamAttendance(month?: string, department?: string) {
   return useQuery({
     queryKey: ATTENDANCE_KEYS.team(month, department),
     queryFn: () => attendanceApi.getTeamAttendance(month, department),
+    placeholderData: keepPreviousData,
   })
 }

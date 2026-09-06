@@ -31,6 +31,20 @@ export const LateStatusBadge: React.FC<LateStatusBadgeProps> = ({ status, lateMi
           <span>ขาดงาน</span>
         </Badge>
       )
+    case 'absent_half_morning':
+      return (
+        <Badge variant="destructive" className="gap-1 px-2.5 py-1">
+          <XCircle className="h-3.5 w-3.5" />
+          <span>ขาดครึ่งเช้า {lateMinutes ? `(สายบ่าย ${lateMinutes} นาที)` : ''}</span>
+        </Badge>
+      )
+    case 'absent_half_afternoon':
+      return (
+        <Badge variant="destructive" className="gap-1 px-2.5 py-1">
+          <XCircle className="h-3.5 w-3.5" />
+          <span>ขาดครึ่งบ่าย</span>
+        </Badge>
+      )
     default:
       return <Badge variant="secondary">-</Badge>
   }

@@ -25,7 +25,7 @@ import {
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth()
   const currentMonthStr = new Date().toISOString().slice(0, 7)
-  
+
   const { data: summary, isLoading: isSummaryLoading } = useAttendanceSummary(currentMonthStr)
   const { data: records = [], isLoading: isRecordsLoading } = useAttendanceRecords(currentMonthStr)
   const { data: leaves = [], isLoading: isLeavesLoading } = useMyLeaveRequests()
@@ -52,18 +52,9 @@ export const DashboardPage: React.FC = () => {
         <div className="absolute right-0 top-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-white/10 blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-indigo-100 backdrop-blur-sm">
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>ภาพรวมประจำเดือน {currentMonthThai}</span>
-            </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
               สวัสดี, คุณ{user?.name || 'พนักงาน'}
             </h2>
-            <p className="text-sm text-indigo-100/90 max-w-xl">
-              รหัสพนักงาน: <span className="font-semibold text-white">{user?.employeeId}</span> | แผนก:{' '}
-              <span className="font-semibold text-white">{user?.department || 'Engineering'}</span> | ตำแหน่ง:{' '}
-              <span className="font-semibold text-white">{user?.position || 'Software Engineer'}</span>
-            </p>
           </div>
 
           <div className="flex flex-wrap gap-2.5">

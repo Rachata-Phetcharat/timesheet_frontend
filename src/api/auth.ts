@@ -1,56 +1,47 @@
 import apiClient from './client'
 import { AuthResponse, LoginCredentials, RefreshTokenResponse, User } from '../types/user'
-import { DEMO_USER, DEMO_ADMIN } from './mockData'
 
 export const authApi = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    try {
-      const response = await apiClient.post<AuthResponse>('/auth/login', credentials)
-      return response.data
-    } catch (error) {
-      // Fallback for standalone/demo mode if backend is not reachable
-      console.warn('Backend /auth/login unreachable or failed. Falling back to local mock authentication:', error)
-      
-      const isAdmin = credentials.email.toLowerCase().includes('admin')
-      const targetUser = isAdmin ? DEMO_ADMIN : DEMO_USER
-      
-      const mockResponse: AuthResponse = {
-        accessToken: `mock_jwt_access_token_${Date.now()}`,
-        refreshToken: `mock_jwt_refresh_token_${Date.now()}`,
-        user: {
-          ...targetUser,
-          email: credentials.email || targetUser.email,
-        },
-      }
-      return mockResponse
+    const response = await apiClient.post<any>('/auth/login', credentials)
+    
+    const accessToken = response.data.access_token
+    const refreshToken = response.data.refresh_token
+    localStorage.setItem('timesheet_access_token', accessToken)
+    if (refreshToken) {
+      localStorage.setItem('timesheet_refresh_token', refreshToken)
+    }
+
+    const userResponse = await apiClient.get<any>('/auth/me')
+    
+    return {
+      accessToken,
+      refreshToken,
+      user: {
+        ...userResponse.data,
+        name: userResponse.data.full_name || userResponse.data.name,
+        employeeId: userResponse.data.employee_id || userResponse.data.id,
+      },
     }
   },
 
   refreshToken: async (token?: string): Promise<RefreshTokenResponse> => {
     const rToken = token || localStorage.getItem('timesheet_refresh_token')
-    try {
-      const response = await apiClient.post<RefreshTokenResponse>('/auth/refresh', {
-        refreshToken: rToken,
-      })
-      return response.data
-    } catch (error) {
-      console.warn('Backend /auth/refresh unreachable. Returning refreshed mock token:', error)
-      return {
-        accessToken: `mock_jwt_access_token_refreshed_${Date.now()}`,
-      }
+    const response = await apiClient.post<any>('/auth/refresh', {
+      refresh_token: rToken,
+    })
+    return {
+      accessToken: response.data.access_token,
+      refreshToken: response.data.refresh_token,
     }
   },
 
   getMe: async (): Promise<User> => {
-    try {
-      const response = await apiClient.get<User>('/auth/me')
-      return response.data
-    } catch {
-      const stored = localStorage.getItem('timesheet_user')
-      if (stored) {
-        return JSON.parse(stored)
-      }
-      return DEMO_USER
+    const response = await apiClient.get<any>('/auth/me')
+    return {
+      ...response.data,
+      name: response.data.full_name || response.data.name,
+      employeeId: response.data.employee_id || response.data.id,
     }
   },
 

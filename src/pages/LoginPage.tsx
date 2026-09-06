@@ -7,7 +7,7 @@ import { useAuth } from '../hooks/useAuth'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card'
-import { Clock, ShieldCheck, UserCheck, Lock, Mail, AlertCircle } from 'lucide-react'
+import { Clock, Lock, AlertCircle } from 'lucide-react'
 
 const loginSchema = z.object({
   email: z.string().email('กรุณากรอกอีเมลที่ถูกต้อง'),
@@ -28,13 +28,12 @@ export const LoginPage: React.FC = () => {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: 'somchai@company.com',
-      password: 'password123',
+      email: '',
+      password: '',
     },
   })
 
@@ -44,23 +43,24 @@ export const LoginPage: React.FC = () => {
     try {
       await login(values)
       navigate(from, { replace: true })
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'เข้าสู่ระบบไม่สำเร็จ โปรดตรวจสอบอีเมลหรือรหัสผ่าน'
+    } catch (err: any) {
+      let msg = 'เข้าสู่ระบบไม่สำเร็จ โปรดตรวจสอบอีเมลหรือรหัสผ่าน'
+      if (err.response?.data?.detail) {
+        const detail = err.response.data.detail
+        if (Array.isArray(detail)) {
+          msg = detail.map((d: any) => d.msg).join(', ')
+        } else if (typeof detail === 'string') {
+          msg = detail
+        }
+      } else if (err instanceof Error) {
+        msg = err.message
+      }
       setErrorMessage(msg)
     } finally {
       setIsLoggingIn(false)
     }
   }
 
-  const fillDemoAccount = (role: 'employee' | 'admin') => {
-    if (role === 'employee') {
-      setValue('email', 'somchai@company.com')
-      setValue('password', 'password123')
-    } else {
-      setValue('email', 'admin@company.com')
-      setValue('password', 'admin12345')
-    }
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-tr from-slate-100 via-indigo-50/40 to-slate-100 flex items-center justify-center p-4">
@@ -125,34 +125,7 @@ export const LoginPage: React.FC = () => {
               </Button>
             </form>
 
-            {/* Quick Demo Fill Buttons */}
-            <div className="pt-3 border-t border-slate-100">
-              <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 text-center mb-2">
-                บัญชีทดสอบด่วน (Quick Demo)
-              </span>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="gap-1.5 text-xs text-slate-700 hover:border-indigo-300 hover:bg-indigo-50/50"
-                  onClick={() => fillDemoAccount('employee')}
-                >
-                  <UserCheck className="h-3.5 w-3.5 text-indigo-600" />
-                  พนักงาน (Employee)
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="gap-1.5 text-xs text-slate-700 hover:border-indigo-300 hover:bg-indigo-50/50"
-                  onClick={() => fillDemoAccount('admin')}
-                >
-                  <ShieldCheck className="h-3.5 w-3.5 text-indigo-600" />
-                  ผู้ดูแล (HR Admin)
-                </Button>
-              </div>
-            </div>
+
           </CardContent>
         </Card>
 

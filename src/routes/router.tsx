@@ -8,6 +8,8 @@ import { AttendancePage } from '../pages/AttendancePage'
 import { LeaveRequestPage } from '../pages/LeaveRequestPage'
 import { AdminReportPage } from '../pages/AdminReportPage'
 
+import { TeamAttendancePage } from '../pages/TeamAttendancePage'
+
 // Protected Route Guard
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth()
@@ -46,6 +48,17 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <>{children}</>
 }
 
+// Employee Route Guard
+const EmployeeRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth()
+
+  if (user?.role === 'admin') {
+    return <Navigate to="/admin/reports" replace />
+  }
+
+  return <>{children}</>
+}
+
 // Admin Route Guard
 const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth()
@@ -56,9 +69,6 @@ const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <h3 className="text-lg font-bold text-rose-900">ไม่มีสิทธิ์เข้าถึงหน้านี้ (Admin Only)</h3>
         <p className="text-sm text-rose-700">
           หน้านี้สงวนสิทธิ์สำหรับฝ่ายทรัพยากรบุคคล (HR) หรือผู้ดูแลระบบเท่านั้น
-        </p>
-        <p className="text-xs text-rose-600">
-          คำแนะนำ: คุณสามารถคลิกสลับบทบาทเป็น "ผู้ดูแลระบบ (Admin)" ที่แถบด้านบนเพื่อทดสอบหน้านี้ได้
         </p>
       </div>
     )
@@ -86,15 +96,35 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <DashboardPage />,
+        element: (
+          <EmployeeRoute>
+            <DashboardPage />
+          </EmployeeRoute>
+        ),
       },
       {
         path: 'attendance',
-        element: <AttendancePage />,
+        element: (
+          <EmployeeRoute>
+            <AttendancePage />
+          </EmployeeRoute>
+        ),
       },
       {
         path: 'leave-requests',
-        element: <LeaveRequestPage />,
+        element: (
+          <EmployeeRoute>
+            <LeaveRequestPage />
+          </EmployeeRoute>
+        ),
+      },
+      {
+        path: 'team-attendance',
+        element: (
+          <EmployeeRoute>
+            <TeamAttendancePage />
+          </EmployeeRoute>
+        ),
       },
       {
         path: 'admin/reports',

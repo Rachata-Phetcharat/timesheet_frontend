@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { AttendanceRecord } from '../../types/attendance'
+import { Pagination } from '../ui/pagination'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 import { LateStatusBadge } from './LateStatusBadge'
 import { formatDate, formatTime } from '../../lib/utils'
@@ -22,6 +23,8 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
 
   const filteredRecords = records.filter((r) => {
     const matchesStatus = statusFilter === 'all' || r.status === statusFilter
@@ -31,6 +34,11 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
       (r.notes && r.notes.toLowerCase().includes(searchTerm.toLowerCase()))
     return matchesStatus && matchesSearch
   })
+  const totalPages = Math.ceil(filteredRecords.length / itemsPerPage)
+  React.useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, statusFilter, selectedMonth])
+  const paginatedRecords = filteredRecords.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
   return (
     <div className="space-y-4">
@@ -56,6 +64,8 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
                 { label: 'ตรงเวลา', value: 'on_time' },
                 { label: 'มาสาย', value: 'late' },
                 { label: 'ขาดงาน', value: 'absent' },
+                { label: 'ขาดครึ่งเช้า', value: 'absent_half_morning' },
+                { label: 'ขาดครึ่งบ่าย', value: 'absent_half_afternoon' },
               ]}
             />
           </div>
@@ -94,7 +104,7 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
                   </TableCell>
                 </TableRow>
               ))
-            ) : filteredRecords.length === 0 ? (
+            ) : paginatedRecords.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-32 text-center text-slate-400">
                   <div className="flex flex-col items-center justify-center gap-2">
@@ -104,7 +114,7 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
                 </TableCell>
               </TableRow>
             ) : (
-              filteredRecords.map((record) => (
+              paginatedRecords.map((record) => (
                 <TableRow key={record.id} className="hover:bg-slate-50/80 transition-colors">
                   <TableCell className="font-medium text-slate-900">
                     {record.date ? formatDate(record.date) : formatDate(record.clockInAt)}
@@ -136,6 +146,7 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
           </TableBody>
         </Table>
       </div>
+      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
     </div>
   )
 }
