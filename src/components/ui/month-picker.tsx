@@ -27,7 +27,8 @@ export const MonthPicker: React.FC<MonthPickerProps> = ({ value, onChange, label
       const spaceAbove = rect.top
       const spaceRight = window.innerWidth - rect.left
       
-      if (spaceBelow < 350 && spaceAbove > spaceBelow) {
+      // Popup height is ~240px. Only open upwards if there is less than 260px below AND more space above.
+      if (spaceBelow < 260 && spaceAbove > spaceBelow) {
         setPosition('top')
       } else {
         setPosition('bottom')

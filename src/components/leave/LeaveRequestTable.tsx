@@ -134,7 +134,7 @@ export const LeaveRequestTable: React.FC<LeaveRequestTableProps> = ({
                 <TableCell colSpan={isAdmin ? 6 : 5} className="h-32 text-center text-slate-400">
                   <div className="flex flex-col items-center justify-center gap-2">
                     <Calendar className="h-8 w-8 text-slate-300" />
-                    <span>ไม่พบรายการคำขอลา</span>
+                    <span>ไม่พบประวัติการลา</span>
                   </div>
                 </TableCell>
               </TableRow>
@@ -180,7 +180,7 @@ export const LeaveRequestTable: React.FC<LeaveRequestTableProps> = ({
                         <span>{isAdmin && req.status === 'pending' ? 'พิจารณา' : 'ดูรายละเอียด'}</span>
                       </Button>
                       
-                      {!isAdmin && req.status === 'pending' && onCancel && (
+                      {!isAdmin && (req.status === 'pending' || req.status === 'approved') && onCancel && (
                         <Button
                           variant="ghost"
                           size="sm"
@@ -205,8 +205,8 @@ export const LeaveRequestTable: React.FC<LeaveRequestTableProps> = ({
       <Modal
         isOpen={!!selectedRequest}
         onClose={() => setSelectedRequest(null)}
-        title="รายละเอียดคำขออนุมัติการลา"
-        description={selectedRequest ? `รหัสคำขอ: ${selectedRequest.id}` : ''}
+        title="รายละเอียดการลา"
+        description={selectedRequest ? `รหัสการลา: ${selectedRequest.id}` : ''}
       >
         {selectedRequest && (
           <div className="space-y-4">
@@ -215,7 +215,7 @@ export const LeaveRequestTable: React.FC<LeaveRequestTableProps> = ({
                 <div className="flex justify-between items-center pb-2 border-b border-slate-200/60">
                   <span className="text-slate-500 flex items-center gap-1.5">
                     <User className="h-4 w-4 text-slate-400" />
-                    ผู้ยื่นคำขอ
+                    พนักงาน
                   </span>
                   <span className="font-semibold text-slate-800">
                     {selectedRequest.employeeName}

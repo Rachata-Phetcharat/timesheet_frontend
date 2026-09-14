@@ -8,7 +8,11 @@ import { useClockIn, useClockOut, useAttendanceSummary } from '../../hooks/useAt
 import { formatTime } from '../../lib/utils'
 import { Clock, LogIn, LogOut, CheckCircle, AlertTriangle, Calendar } from 'lucide-react'
 
-export const ClockInOutCard: React.FC = () => {
+interface ClockInOutCardProps {
+  readOnly?: boolean
+}
+
+export const ClockInOutCard: React.FC<ClockInOutCardProps> = ({ readOnly = false }) => {
   const [currentTime, setCurrentTime] = useState<Date>(new Date())
   const [notes, setNotes] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -159,31 +163,33 @@ export const ClockInOutCard: React.FC = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            <Button
-              variant="default"
-              size="lg"
-              className="flex-1 gap-2 bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-200"
-              disabled={isClockedIn || isClockedOut || isSummaryLoading}
-              onClick={() => handleOpenAction('in')}
-              isLoading={clockInMutation.isPending}
-            >
-              <LogIn className="h-5 w-5" />
-              {isClockedIn || isClockedOut ? 'ลงเวลาเข้างานแล้ว' : 'ลงเวลาเข้างาน (Clock In)'}
-            </Button>
+          {!readOnly && (
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <Button
+                variant="default"
+                size="lg"
+                className="flex-1 gap-2 bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-200"
+                disabled={isClockedIn || isClockedOut || isSummaryLoading}
+                onClick={() => handleOpenAction('in')}
+                isLoading={clockInMutation.isPending}
+              >
+                <LogIn className="h-5 w-5" />
+                {isClockedIn || isClockedOut ? 'ลงเวลาเข้างานแล้ว' : 'ลงเวลาเข้างาน (Clock In)'}
+              </Button>
 
-            <Button
-              variant="destructive"
-              size="lg"
-              className="flex-1 gap-2 bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-200"
-              disabled={!isClockedIn || isClockedOut || isSummaryLoading}
-              onClick={() => handleOpenAction('out')}
-              isLoading={clockOutMutation.isPending}
-            >
-              <LogOut className="h-5 w-5" />
-              {isClockedOut ? 'ลงเวลาออกงานแล้ว' : 'ลงเวลาออกงาน (Clock Out)'}
-            </Button>
-          </div>
+              <Button
+                variant="destructive"
+                size="lg"
+                className="flex-1 gap-2 bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-200"
+                disabled={!isClockedIn || isClockedOut || isSummaryLoading}
+                onClick={() => handleOpenAction('out')}
+                isLoading={clockOutMutation.isPending}
+              >
+                <LogOut className="h-5 w-5" />
+                {isClockedOut ? 'ลงเวลาออกงานแล้ว' : 'ลงเวลาออกงาน (Clock Out)'}
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -202,7 +208,7 @@ export const ClockInOutCard: React.FC = () => {
           <div className="rounded-xl bg-slate-50 p-3.5 text-sm text-slate-600 flex items-start gap-2.5">
             <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
             <p>
-              โปรดตรวจสอบเวลาปัจจุบัน ({formattedDigitalTime}) ให้ถูกต้องก่อนกดยืนยันบันทึกเวลา
+              โปรดตรวจสอบเวลาปัจจุบันให้ถูกต้องก่อนกดยืนยันบันทึกเวลา
             </p>
           </div>
 

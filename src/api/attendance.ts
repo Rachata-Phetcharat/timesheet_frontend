@@ -48,6 +48,7 @@ export const attendanceApi = {
       onTimeCount: response.data.on_time_count,
       lateCount: response.data.late_count,
       absentCount: response.data.absent_count,
+      totalLateMinutes: response.data.total_late_minutes || 0,
       leaveCount: 0,
       totalWorkHours: 0,
       currentStatus,

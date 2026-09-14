@@ -35,12 +35,12 @@ export const DashboardPage: React.FC = () => {
     year: 'numeric',
   })
 
-  // Quick stats calculations
-  const totalDays = records.length
-  const onTimeCount = records.filter((r) => r.status === 'on_time').length
-  const lateCount = records.filter((r) => r.status === 'late').length
-  const absentCount = records.filter((r) => r.status === 'absent').length
-  const totalLateMinutes = records.reduce((acc, curr) => acc + (curr.lateMinutes || 0), 0)
+  // Quick stats calculations from backend API summary
+  const totalDays = summary?.totalDays || 0
+  const onTimeCount = summary?.onTimeCount || 0
+  const lateCount = summary?.lateCount || 0
+  const absentCount = summary?.absentCount || 0
+  const totalLateMinutes = summary?.totalLateMinutes || 0
   const totalHours = summary?.totalWorkHours || 0
 
   const onTimePercentage = totalDays > 0 ? Math.round((onTimeCount / totalDays) * 100) : 100
@@ -70,11 +70,11 @@ export const DashboardPage: React.FC = () => {
             </Link>
             <Link to="/leave-requests">
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
-                className="border-white/30 text-white hover:bg-white/10 hover:text-white"
+                className="bg-white text-indigo-900 hover:bg-indigo-50 font-semibold shadow-sm"
               >
-                <FileText className="mr-1.5 h-4 w-4 text-indigo-200" />
+                <FileText className="mr-1.5 h-4 w-4 text-indigo-600" />
                 ยื่นคำขอลางาน
               </Button>
             </Link>
@@ -165,7 +165,7 @@ export const DashboardPage: React.FC = () => {
       {/* Main Row: Clock in Card + Pending Leaves */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <ClockInOutCard />
+          <ClockInOutCard readOnly={true} />
         </div>
 
         {/* Leave Requests Quick Card */}
@@ -175,13 +175,13 @@ export const DashboardPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-indigo-600" />
-                  สถานะคำขอลางานล่าสุด
+                  ประวัติการลางานล่าสุด
                 </CardTitle>
                 <Link to="/leave-requests" className="text-xs font-semibold text-indigo-600 hover:underline">
                   ดูทั้งหมด
                 </Link>
               </div>
-              <CardDescription>รายการคำขอล่าสุดของคุณ</CardDescription>
+              <CardDescription>รายการบันทึกวันลาล่าสุดของคุณ</CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-3 flex-1">
@@ -219,7 +219,7 @@ export const DashboardPage: React.FC = () => {
             <div className="p-4 pt-0 border-t border-slate-100">
               <Link to="/leave-requests">
                 <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs text-slate-700">
-                  <span>ยื่นใบลาใหม่</span>
+                  <span>บันทึกวันลาใหม่</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               </Link>

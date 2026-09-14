@@ -133,8 +133,8 @@ export const LeaveRequestForm: React.FC<LeaveRequestFormProps> = ({
         <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 p-4 text-sm text-emerald-800">
           <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
           <div>
-            <p className="font-semibold">ส่งคำขอลาสำเร็จ!</p>
-            <p className="text-xs text-emerald-700">คำขอของคุณถูกส่งไปยังหัวหน้างานและฝ่ายบุคคลเพื่อรออนุมัติแล้ว</p>
+            <p className="font-semibold">บันทึกการลาสำเร็จ!</p>
+            <p className="text-xs text-emerald-700">ระบบได้ทำการอนุมัติการลาของคุณเรียบร้อยแล้ว</p>
           </div>
         </div>
       )}
@@ -194,7 +194,7 @@ export const LeaveRequestForm: React.FC<LeaveRequestFormProps> = ({
           isLoading={isLoading}
         >
           <Send className="h-4 w-4" />
-          ส่งคำขออนุมัติการลา
+          ยืนยันการบันทึกวันลา
         </Button>
       </div>
     </form>

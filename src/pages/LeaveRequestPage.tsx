@@ -50,7 +50,7 @@ export const LeaveRequestPage: React.FC = () => {
           ระบบยื่นคำขอลางาน & ประวัติการลา
         </h2>
         <p className="text-sm text-slate-500">
-          ยื่นคำขอลากิจ ลาป่วย ลาพักร้อน พร้อมติดตามสถานะการอนุมัติแบบเรียลไทม์
+          ยื่นคำขอลากิจ ลาป่วย ลาพักร้อน โดยระบบจะอนุมัติให้อัตโนมัติทันที
         </p>
       </div>
 
@@ -104,7 +104,7 @@ export const LeaveRequestPage: React.FC = () => {
             <CardHeader className="pb-4">
               <CardTitle className="text-base flex items-center gap-2">
                 <FileText className="h-5 w-5 text-indigo-600" />
-                แบบฟอร์มยื่นคำขอลางาน
+                แบบฟอร์มบันทึกการลางาน
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -125,7 +125,7 @@ export const LeaveRequestPage: React.FC = () => {
         <div className="xl:col-span-8">
           <Card className="border-slate-200/80 bg-white">
             <CardHeader className="pb-4">
-              <CardTitle className="text-base">ประวัติและสถานะคำขอลางาน</CardTitle>
+              <CardTitle className="text-base">ประวัติและสถานะการลางาน</CardTitle>
             </CardHeader>
             <CardContent>
               <LeaveRequestTable

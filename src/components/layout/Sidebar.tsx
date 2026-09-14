@@ -7,6 +7,7 @@ import {
   CalendarDays,
   FileBarChart,
   Users,
+  Calendar,
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -18,36 +19,35 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth()
   const isAdmin = user?.role === 'admin'
 
-  const navItems = [
+  const menuGroups = [
     {
-      to: '/',
-      label: 'แดชบอร์ดสรุป',
-      icon: LayoutDashboard,
+      title: 'ทั่วไป',
+      items: [
+        { to: '/', label: 'แดชบอร์ดสรุป', icon: LayoutDashboard },
+      ],
     },
     {
-      to: '/attendance',
-      label: 'ลงเวลาทำงาน',
-      icon: Clock,
+      title: 'เวลาทำงาน',
+      items: [
+        { to: '/attendance', label: 'ลงเวลาทำงาน', icon: Clock },
+        { to: '/team-attendance', label: 'ตารางเข้างานของทีม', icon: Users },
+      ],
     },
     {
-      to: '/leave-requests',
-      label: 'คำขอลางาน',
-      icon: CalendarDays,
-    },
-    {
-      to: '/team-attendance',
-      label: 'ตารางเข้างานของทีม',
-      icon: Users,
+      title: 'การลางาน',
+      items: [
+        { to: '/leave-requests', label: 'ยื่นคำขอลางาน', icon: CalendarDays },
+        { to: '/leave-calendar', label: 'ปฏิทินการลา', icon: Calendar },
+      ],
     },
   ]
 
-  const adminItems = [
-    {
-      to: '/admin/reports',
-      label: 'รายงานทีม & อนุมัติ',
-      icon: FileBarChart,
-    },
-  ]
+  const adminGroup = {
+    title: 'สำหรับผู้ดูแลระบบ (HR Admin)',
+    items: [
+      { to: '/admin/reports', label: 'รายงานทีม & สถิติ', icon: FileBarChart },
+    ],
+  }
 
   return (
     <>
@@ -61,19 +61,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
       {/* Sidebar Content */}
       <aside
-        className={`fixed top-16 bottom-0 left-0 z-40 w-64 border-r border-slate-200/80 bg-white p-4 transition-transform duration-200 ease-in-out lg:translate-x-0 flex flex-col justify-between ${
+        className={`fixed top-16 bottom-0 left-0 z-40 w-64 border-r border-slate-200/80 bg-white p-4 transition-transform duration-200 ease-in-out lg:translate-x-0 flex flex-col justify-between overflow-y-auto ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="space-y-6">
-          {/* Main Navigation */}
-          {!isAdmin && (
-            <div>
+          {menuGroups.map((group, idx) => (
+            <div key={idx}>
               <span className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                เมนูหลัก
+                {group.title}
               </span>
               <nav className="mt-2 space-y-1">
-                {navItems.map((item) => (
+                {group.items.map((item) => (
                   <NavLink
                     key={item.to}
                     to={item.to}
@@ -93,18 +92,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 ))}
               </nav>
             </div>
-          )}
+          ))}
 
-          {/* Admin Management Section */}
           {isAdmin && (
-            <div>
-              <div className="flex items-center gap-1.5 px-3">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  ฝ่ายบุคคล (HR Admin)
-                </span>
-              </div>
+            <div className="pt-2 border-t border-slate-100">
+              <span className="px-3 text-[11px] font-bold uppercase tracking-wider text-rose-500">
+                {adminGroup.title}
+              </span>
               <nav className="mt-2 space-y-1">
-                {adminItems.map((item) => (
+                {adminGroup.items.map((item) => (
                   <NavLink
                     key={item.to}
                     to={item.to}
@@ -112,7 +108,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     className={({ isActive }) =>
                       `flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all ${
                         isActive
-                          ? 'bg-indigo-50 text-indigo-600 font-semibold shadow-xs'
+                          ? 'bg-rose-50 text-rose-600 font-semibold shadow-xs'
                           : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                       }`
                     }

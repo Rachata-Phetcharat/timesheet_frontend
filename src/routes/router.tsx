@@ -9,6 +9,7 @@ import { LeaveRequestPage } from '../pages/LeaveRequestPage'
 import { AdminReportPage } from '../pages/AdminReportPage'
 
 import { TeamAttendancePage } from '../pages/TeamAttendancePage'
+import { LeaveCalendarPage } from '../pages/LeaveCalendarPage'
 
 // Protected Route Guard
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -125,6 +126,10 @@ export const router = createBrowserRouter([
             <TeamAttendancePage />
           </EmployeeRoute>
         ),
+      },
+      {
+        path: 'leave-calendar',
+        element: <LeaveCalendarPage />,
       },
       {
         path: 'admin/reports',

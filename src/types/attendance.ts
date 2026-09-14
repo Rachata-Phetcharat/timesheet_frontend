@@ -21,6 +21,7 @@ export interface AttendanceSummary {
   absentCount: number
   leaveCount: number
   totalWorkHours: number
+  totalLateMinutes: number
   currentStatus: 'not_clocked_in' | 'clocked_in' | 'clocked_out'
   todayRecord: AttendanceRecord | null
 }

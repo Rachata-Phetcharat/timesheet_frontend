@@ -7,6 +7,7 @@ import { formatDate, formatTime } from '../../lib/utils'
 import { Search, Filter, Clock, Calendar } from 'lucide-react'
 import { Input } from '../ui/input'
 import { Select } from '../ui/select'
+import { MonthPicker } from '../ui/month-picker'
 
 interface AttendanceTableProps {
   records: AttendanceRecord[]
@@ -72,11 +73,10 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
         </div>
 
         {onMonthChange && (
-          <div className="w-full sm:w-48">
-            <Input
-              type="month"
+          <div className="w-full sm:w-56">
+            <MonthPicker
               value={selectedMonth || new Date().toISOString().slice(0, 7)}
-              onChange={(e) => onMonthChange(e.target.value)}
+              onChange={(val) => onMonthChange(val)}
             />
           </div>
         )}

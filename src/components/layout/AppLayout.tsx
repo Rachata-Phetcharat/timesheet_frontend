@@ -10,7 +10,7 @@ export const AppLayout: React.FC = () => {
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
       <Navbar onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
       
-      <div className="flex flex-1">
+      <div className="flex flex-1 pt-16">
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
         
         {/* Main Content Area */}

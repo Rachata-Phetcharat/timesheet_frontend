@@ -148,14 +148,6 @@ export const AdminReportPage: React.FC = () => {
           <p className="text-xs text-slate-400 mt-1">พนักงาน</p>
         </Card>
 
-        <Card className="p-4 bg-white border-slate-200/80">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">รออนุมัติใบลา</span>
-            <AlertTriangle className="h-5 w-5 text-rose-600" />
-          </div>
-          <p className="mt-2 text-2xl font-black text-rose-600">{pendingLeaves.length}</p>
-          <p className="text-xs text-slate-400 mt-1">รายการรอพิจารณา</p>
-        </Card>
       </div>
 
       {/* Leave Approvals Section */}
@@ -164,11 +156,11 @@ export const AdminReportPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-lg flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-amber-500" />
-                คำขอลางานของพนักงาน (พิจารณาอนุมัติ / ปฏิเสธ)
+                <FileBarChart className="h-5 w-5 text-indigo-500" />
+                ประวัติคำขอลางานของพนักงาน
               </CardTitle>
               <CardDescription>
-                คลิกปุ่ม "พิจารณา" เพื่ออนุมัติหรือปฏิเสธคำขอลาพร้อมใส่ข้อความหมายเหตุ
+                ดูประวัติการขอลางานทั้งหมดของพนักงาน
               </CardDescription>
             </div>
           </div>
